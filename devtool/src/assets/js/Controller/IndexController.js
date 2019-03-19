@@ -1,8 +1,8 @@
 require('SassPath/index.scss');
 
-import BaseController from 'ControllerPath/BaseController';
-
 import View from 'ViewPath/View';
+
+import BaseController from 'ControllerPath/BaseController';
 
 import * as Utility from 'LibrariesPath/Utilities/Utility';
 
@@ -20,50 +20,46 @@ new BaseController().registerController({
     },
 
     ready: function() {
-        Utility.addEventListener(document.getElementById('send'),
-            'click',
-            function() {
-                if (App.Callback.WebSocket &&
-                    App.Callback.WebSocket.readyState === 1) {
-                    App.Callback.WebSocket.send('Timestamp at ' +
-                        new Date().getTime());
+        if (App.Callback.WebSocket) {
+            Utility.addEventListener(document.getElementById('send'),
+                'click',
+                function() {
+                    if (App.Callback.WebSocket.readyState === 1) {
+                        App.Callback.WebSocket.send('Timestamp at ' +
+                            new Date().getTime());
+                    }
                 }
-            }
-        );
+            );
 
-        Utility.addEventListener(document.getElementById('clear'),
-            'click',
-            function() {
-                if (App.Callback.WebSocket &&
-                    App.Callback.WebSocket.readyState === 1) {
-                    localStorage.setItem('socketData',
-                        JSON.stringify([])
-                    );
-
-                    document.getElementById('msg-data').innerHTML =
-                    '<p>Please send a message.</p>';
+            Utility.addEventListener(document.getElementById('clear'),
+                'click',
+                function() {
+                    if (App.Callback.WebSocket.readyState === 1) {
+                        localStorage.setItem('socketData',
+                            JSON.stringify([])
+                        );
+                        document.getElementById('msg-data').innerHTML =
+                            '<p>Please send a message.</p>';
+                    }
                 }
-            }
-        );
+            );
 
-        Utility.addEventListener(document.getElementById('close'),
-            'click',
-            function() {
-                if (App.Callback.WebSocket) {
+            Utility.addEventListener(document.getElementById('close'),
+                'click',
+                function() {
                     App.Callback.WebSocket.close();
                 }
-            }
-        );
+            );
 
-        if (App.Callback.WebSocket) {
             App.Callback.WebSocket.onopen = function() {
                 document.getElementById('msg').innerHTML = 'Connection Open';
+                document.getElementById('msg-data').innerHTML =
+                    '<p>Please send a message.</p>';
             };
-        }
 
-        if (App.Callback.WebSocket) {
             App.Callback.WebSocket.onmessage = function(event) {
-                document.getElementById('msg').innerHTML = 'Sending Messages';
+                document.getElementById('msg').innerHTML =
+                    '<p>Sending Messages.</p>';
                 let msg = '';
                 let msgData = [];
 
@@ -78,24 +74,22 @@ new BaseController().registerController({
                 if (localStorage.getItem('socketData') !== null) {
                     let Data = JSON.parse(localStorage.getItem('socketData'));
                     for (var i = 0; i < Data.length; i++) {
-                        msg += '<p>MSG Rcvd = ' + Data[i] + '</p>';
+                        msg += '<p>MSG Rcvd = ' + Data[i] + '.</p>';
                     }
                 }
 
                 document.getElementById('msg-data').innerHTML = msg;
             };
-        }
 
-        if (App.Callback.WebSocket) {
             App.Callback.WebSocket.onerror = function() {
                 document.getElementById('msg').innerHTML =
-                    'Something Went Wrong';
+                    '<p>Something Went Wrong.</p>';
             };
-        }
 
-        if (App.Callback.WebSocket) {
             App.Callback.WebSocket.onclose = function() {
-                document.getElementById('msg').innerHTML = 'Connection Closed';
+                document.getElementById('msg').innerHTML =
+                    '<p>Connection Closed.</p>';
+                document.getElementById('msg-data').innerHTML = '';
             };
         }
     }
